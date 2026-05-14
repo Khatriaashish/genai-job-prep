@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "../style/interview.scss";
 import { useInterview } from "../hooks/useInterview";
-import { useNavigate, useParams } from "react-router";
+import { Link, useParams } from "react-router";
 
 const NAV_ITEMS = [
   { id: "technical", label: "Technical Questions" },
@@ -56,19 +56,28 @@ const RoadMapDay = ({ day }: { day: any }) => (
 
 const Interview = () => {
   const [activeNav, setActiveNav] = useState("technical");
-  const { report, getReportById, loading, getResumePdf } = useInterview();
+  const { report, loading, error, getResumePdf } = useInterview();
   const { interviewId } = useParams();
 
-  useEffect(() => {
-    if (interviewId) {
-      getReportById(interviewId);
-    }
-  }, [interviewId]);
-
-  if (loading || !report) {
+  if (loading) {
     return (
       <main className="loading-screen">
-        <h1>Loading your interview plan...</h1>
+        <div className="loader" aria-label="Loading" />
+        <h1>Loading your interview plan</h1>
+        <p>AI-generated plans may take a few seconds to retrieve.</p>
+      </main>
+    );
+  }
+
+  if (!report) {
+    return (
+      <main className="empty-screen">
+        <div className="alert alert--error">
+          {error || "This interview plan could not be loaded."}
+        </div>
+        <Link className="button primary-button" to="/">
+          Back to plans
+        </Link>
       </main>
     );
   }
@@ -85,6 +94,9 @@ const Interview = () => {
       <div className="interview-layout">
         <nav className="interview-nav">
           <div className="nav-content">
+            <Link className="back-link" to="/">
+              Back to plans
+            </Link>
             <p className="interview-nav__label">Sections</p>
             {NAV_ITEMS.map((item) => (
               <button
@@ -101,6 +113,7 @@ const Interview = () => {
               getResumePdf(interviewId);
             }}
             className="button primary-button"
+            disabled={loading}
           >
             Download Resume
           </button>
@@ -121,6 +134,9 @@ const Interview = () => {
                 {(report.technicalQuestions || []).map((q: any, i: number) => (
                   <QuestionCard key={i} item={q} index={i} />
                 ))}
+                {(report.technicalQuestions || []).length === 0 && (
+                  <p className="empty-state">No technical questions were generated for this plan.</p>
+                )}
               </div>
             </section>
           )}
@@ -137,6 +153,9 @@ const Interview = () => {
                 {(report.behavioralQuestions || []).map((q: any, i: number) => (
                   <QuestionCard key={i} item={q} index={i} />
                 ))}
+                {(report.behavioralQuestions || []).length === 0 && (
+                  <p className="empty-state">No behavioral questions were generated for this plan.</p>
+                )}
               </div>
             </section>
           )}
@@ -153,6 +172,9 @@ const Interview = () => {
                 {(report.preparationPlan || []).map((day: any) => (
                   <RoadMapDay key={day.day} day={day} />
                 ))}
+                {(report.preparationPlan || []).length === 0 && (
+                  <p className="empty-state">No preparation road map was generated for this plan.</p>
+                )}
               </div>
             </section>
           )}
@@ -161,13 +183,20 @@ const Interview = () => {
         <div className="interview-divider" />
 
         <aside className="interview-sidebar">
+          {error && <div className="alert alert--error">{error}</div>}
           <div className="match-score">
             <p className="match-score__label">Match Score</p>
             <div className={`match-score__ring ${scoreColor}`}>
               <span className="match-score__value">{report.matchScore}</span>
               <span className="match-score__pct">%</span>
             </div>
-            <p className="match-score__sub">Strong match for this role</p>
+            <p className="match-score__sub">
+              {(report.matchScore || 0) >= 80
+                ? "Strong match for this role"
+                : (report.matchScore || 0) >= 60
+                  ? "Good match with gaps"
+                  : "Focused preparation needed"}
+            </p>
           </div>
 
           <div className="sidebar-divider" />

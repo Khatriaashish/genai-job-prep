@@ -7,6 +7,7 @@ import {
 import { useContext, useEffect } from "react";
 import { InterviewContext } from "../interview.context";
 import { useParams } from "react-router";
+import { getApiErrorMessage } from "../../../utils/apiError";
 
 export const useInterview = () => {
   const context = useContext(InterviewContext);
@@ -16,7 +17,7 @@ export const useInterview = () => {
     throw new Error("useInterview must be used within an InterviewProvider");
   }
 
-  const { loading, setLoading, report, setReport, reports, setReports } =
+  const { loading, setLoading, error, setError, report, setReport, reports, setReports } =
     context;
 
   const generateReport = async ({
@@ -26,9 +27,10 @@ export const useInterview = () => {
   }: {
     jobDescription: string;
     selfDescription: string;
-    resumeFile: File;
+    resumeFile?: File;
   }) => {
     setLoading(true);
+    setError(null);
     let response: any = null;
     try {
       response = await generateInterviewReport({
@@ -38,7 +40,12 @@ export const useInterview = () => {
       });
       setReport(response.interviewReport);
     } catch (error) {
-      console.log(error);
+      setError(
+        getApiErrorMessage(
+          error,
+          "Could not generate the interview plan. Please try again.",
+        ),
+      );
     } finally {
       setLoading(false);
     }
@@ -48,12 +55,19 @@ export const useInterview = () => {
 
   const getReportById = async (interviewId: string | undefined) => {
     setLoading(true);
+    setError(null);
     let response: any = null;
     try {
       response = await getInterviewReportById(interviewId);
       setReport(response.interviewReport);
     } catch (error) {
-      console.log(error);
+      setReport(null);
+      setError(
+        getApiErrorMessage(
+          error,
+          "Could not load this interview plan. Please try again.",
+        ),
+      );
     } finally {
       setLoading(false);
     }
@@ -62,12 +76,18 @@ export const useInterview = () => {
 
   const getReports = async () => {
     setLoading(true);
+    setError(null);
     let response: any = null;
     try {
       response = await getAllInterviewReports();
       setReports(response.interviewReports);
     } catch (error) {
-      console.log(error);
+      setError(
+        getApiErrorMessage(
+          error,
+          "Could not load your recent interview plans.",
+        ),
+      );
     } finally {
       setLoading(false);
     }
@@ -77,6 +97,7 @@ export const useInterview = () => {
 
   const getResumePdf = async (interviewReportId: string | undefined) => {
     setLoading(true);
+    setError(null);
     let response: any = null;
     try {
       response = await generateResumePdf({ interviewReportId });
@@ -88,8 +109,15 @@ export const useInterview = () => {
       link.setAttribute("download", `resume_${interviewReportId}.pdf`);
       document.body.appendChild(link);
       link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.log(error);
+      setError(
+        getApiErrorMessage(
+          error,
+          "Could not download the resume PDF. Please try again.",
+        ),
+      );
     } finally {
       setLoading(false);
     }
@@ -105,6 +133,7 @@ export const useInterview = () => {
 
   return {
     loading,
+    error,
     report,
     reports,
     generateReport,

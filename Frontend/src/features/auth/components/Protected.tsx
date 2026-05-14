@@ -7,8 +7,9 @@ const Protected = ({ children }: { children: ReactNode }) => {
 
   if (loading) {
     return (
-      <main>
-        <h1>Loading...</h1>
+      <main className="loading-screen">
+        <div className="loader" aria-label="Loading" />
+        <p>Loading your workspace...</p>
       </main>
     );
   }

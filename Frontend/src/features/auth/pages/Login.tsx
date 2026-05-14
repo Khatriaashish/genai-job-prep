@@ -4,7 +4,7 @@ import "../auth.form.scss";
 import { useAuth } from "../hooks/useAuth";
 
 const Login = () => {
-  const { loading, handleLogin } = useAuth();
+  const { loading, error, handleLogin } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -12,22 +12,28 @@ const Login = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    await handleLogin({ email, password });
-    navigate("/");
+    const user = await handleLogin({ email, password });
+    if (user) navigate("/");
   };
 
   if (loading) {
     return (
-      <main>
-        <h1>Loading.......</h1>
+      <main className="loading-screen">
+        <div className="loader" aria-label="Loading" />
+        <p>Checking your account...</p>
       </main>
     );
   }
 
   return (
-    <main>
+    <main className="auth-page">
       <div className="form-container">
-        <h1>Login</h1>
+        <div className="auth-heading">
+          <p className="section-kicker">Interview Prep</p>
+          <h1>Log in</h1>
+          <p>Open your saved interview plans and resume drafts.</p>
+        </div>
+        {error && <div className="alert alert--error">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label htmlFor="email">Email</label>

@@ -14,17 +14,13 @@ export async function register({
   email: string;
   password: string;
 }): Promise<any> {
-  try {
-    const response = await api.post("/api/auth/register", {
-      username,
-      email,
-      password,
-    });
+  const response = await api.post("/api/auth/register", {
+    username,
+    email,
+    password,
+  });
 
-    return response.data;
-  } catch (err) {
-    console.log(err);
-  }
+  return response.data;
 }
 
 export async function login({
@@ -34,32 +30,22 @@ export async function login({
   email: string;
   password: string;
 }): Promise<any> {
-  try {
-    const response = await api.post("/api/auth/login", {
-      email,
-      password,
-    });
+  const response = await api.post("/api/auth/login", {
+    email,
+    password,
+  });
 
-    return response.data;
-  } catch (err) {
-    console.log(err);
-  }
+  return response.data;
 }
 
 export async function logout(): Promise<any> {
-  try {
-    const response = await api.get("/api/auth/logout");
+  const response = await api.get("/api/auth/logout");
 
-    return response.data;
-  } catch (err) {}
+  return response.data;
 }
 
 export async function getMe(): Promise<any> {
-  try {
-    const response = await api.get("/api/auth/get-me");
+  const response = await api.get("/api/auth/get-me");
 
-    return response.data;
-  } catch (err) {
-    console.log(err);
-  }
+  return response.data;
 }
