@@ -1,0 +1,17 @@
+import React from "react";
+import { RouterProvider } from "react-router";
+import { router } from "./app.routes";
+import { AuthProvider } from "./features/auth/auth.context";
+import { InterviewProvider } from "./features/interview/interview.context";
+
+function App(): React.ReactElement {
+  return (
+    <AuthProvider>
+      <InterviewProvider>
+        <RouterProvider router={router} />
+      </InterviewProvider>
+    </AuthProvider>
+  );
+}
+
+export default App;
