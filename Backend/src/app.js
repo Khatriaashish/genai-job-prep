@@ -1,6 +1,7 @@
 const express = require("express")
 const cookieParser = require("cookie-parser")
 const cors = require("cors")
+const connectToDB = require("./config/database")
 
 const app = express()
 
@@ -10,6 +11,15 @@ app.use(cors({
     origin: "http://localhost:5173",
     credentials: true
 }))
+
+app.use(async (req, res, next) => {
+    try {
+        await connectToDB()
+        next()
+    } catch (error) {
+        next(error)
+    }
+})
 
 /* require all the routes here */
 const authRouter = require("./routes/auth.routes")
