@@ -1,5 +1,8 @@
 require("dotenv").config();
 const app = require("./src/app");
+const connectToDB = require("./src/config/database");
+
+connectToDB();
 
 // CRITICAL FOR VERCEL: Export the app instance
 module.exports = app;
