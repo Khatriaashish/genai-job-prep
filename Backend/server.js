@@ -1,10 +1,14 @@
-require("dotenv").config()
-const app = require("./src/app")
-const connectToDB = require("./src/config/database")
+require("dotenv").config();
+const app = require("./src/app");
+const connectToDB = require("./src/config/database");
 
-connectToDB()
+connectToDB();
 
+// CRITICAL FOR VERCEL: Export the app instance
+module.exports = app;
 
-app.listen(3000, () => {
-    console.log("Server is running on port 3000")
-})
+// Keep your local port listener active for local development only
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
