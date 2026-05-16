@@ -1,15 +1,20 @@
-const pdfParse = require("pdf-parse");
-const {
-  generateInterviewReport,
-  generateResumePdf,
-} = require("../services/ai.service");
 const interviewReportModel = require("../models/interviewReport.model");
+
+function getPdfParse() {
+  return require("pdf-parse");
+}
+
+function getAiService() {
+  return require("../services/ai.service");
+}
 
 /**
  * @description Controller to generate interview report based on user self description, resume and job description.
  */
 async function generateInterViewReportController(req, res) {
   const { selfDescription, jobDescription } = req.body;
+  const pdfParse = getPdfParse();
+  const { generateInterviewReport } = getAiService();
 
   let resumeText = "";
 
@@ -86,6 +91,7 @@ async function getAllInterviewReportsController(req, res) {
  */
 async function generateResumePdfController(req, res) {
   const { interviewReportId } = req.params;
+  const { generateResumePdf } = getAiService();
 
   const interviewReport =
     await interviewReportModel.findById(interviewReportId);
